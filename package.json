@@ -1,0 +1,39 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "nodemon index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Quang Tran",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.370.0",
+    "@aws-sdk/lib-storage": "^3.370.0",
+    "@aws-sdk/s3-request-presigner": "^3.370.0",
+    "aws-sdk": "^2.1415.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "crypto-js": "^4.1.1",
+    "dotenv": "^16.0.3",
+    "email-existence": "^0.1.6",
+    "express": "^4.18.2",
+    "express-rate-limit": "^6.8.0",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^7.0.3",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.1",
+    "nodemon": "^2.0.22",
+    "sharp": "^0.32.3",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0",
+    "validator": "^13.9.0",
+    "yaml": "^2.3.1"
+  }
+}
