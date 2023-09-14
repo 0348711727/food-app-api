@@ -27,7 +27,6 @@ app.use(limiter); // use before router ?
 
 app.all('*', function (req, res, next) {
   let origin = req.headers.origin;
-  console.log(origin)
   if (corsOptions.origin.indexOf(origin) >= 0) {
     res.header("Access-Control-Allow-Origin", origin);
   }

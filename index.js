@@ -3,7 +3,7 @@ import { dbConnect } from './config/db.js';
 
 dbConnect(); //connect to mongodb
 
-app.listen(5000, () => {
-  console.log('Connect successfully')
+app.listen(process.env.PORT, () => {
+  console.log(`Listening on port ${process.env.PORT}`)
 })
 
