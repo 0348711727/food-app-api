@@ -72,8 +72,9 @@ export const productController = {
   }),
   getDetailProduct: catchAsyncError(async (req, res, next) => {
     try {
-      const { name } = req.params;
-      const product = await Product.find({});
+      const { id } = req.params;
+      const product = await Product.findOne({ imageName: id });
+      if (!product) return next(new ErrorHandler('Product does not exist', 200))
       return res.status(200).json({
         success: true,
         data: product

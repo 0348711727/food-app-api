@@ -26,8 +26,8 @@ const createAccountLimiter = rateLimit({
  *         description: Successful response
  */
 router.post('/addProduct', createAccountLimiter, upload.single('image'), productController.addProduct);
-router.get('/getAllProduct', productController.getAllProduct);
-router.post('/getProductDetail/:id', productController.getDetailProduct);
+router.get('/allProduct', productController.getAllProduct);
+router.get('/productDetail/:id', productController.getDetailProduct);
 
 
 // router.post('/login', productController.logIn);
