@@ -1,6 +1,6 @@
 import catchAsyncError from "../middleware/catchAsyncError.js";
 import { saveToAWS, signedUrl } from "./user.controller.js";
-import Product from '../models/Proudct.js'
+import Product from '../models/Product.js'
 import ErrorHandler from "../utils/ErrorHandler.js";
 import crypto from 'crypto';
 import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
@@ -73,14 +73,34 @@ export const productController = {
   getDetailProduct: catchAsyncError(async (req, res, next) => {
     try {
       const { id } = req.params;
-      const product = await Product.findOne({ imageName: id });
-      if (!product) return next(new ErrorHandler('Product does not exist', 200))
+      const product = await Product.findOne({ imageName: id }).populate('topping');
+      if (!product) return next(new ErrorHandler('Product does not exist', 404))
       return res.status(200).json({
         success: true,
         data: product
       })
     } catch (error) {
       return next(new ErrorHandler(`Can't get product`, 404))
+    }
+  }),
+  updateProduct: catchAsyncError(async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const { updateData } = req.body;
+      let product = await Product.findOneAndUpdate(
+        { imageName: id },
+        { $set: { topping: updateData.topping || product.topping } },
+        { new: true }
+      );
+      if (!product) {
+        return next(new ErrorHandler(`Product does not exist`, 404));
+      }
+      return res.status(200).json({
+        success: true,
+        product
+      })
+    } catch (error) {
+      return next(new ErrorHandler(`Can't update product`, 404))
     }
   })
 }

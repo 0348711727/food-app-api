@@ -1,5 +1,6 @@
 import express from 'express';
 import userRouter from './routes/user.route.js'
+import toppingRouter from './routes/topping.route.js'
 import productRouter from './routes/product.route.js'
 import dotenv from 'dotenv';
 import errorMiddleware from './middleware/error.js';
@@ -39,6 +40,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'))
 app.use('/api/auth', userRouter);
 app.use('/api/product', productRouter);
+app.use('/api/topping', toppingRouter);
 
 app.all('*', (req, res, next) => {
   next(new ErrorHandler(`Can not find ${req.originalUrl} on this server.`, 404));

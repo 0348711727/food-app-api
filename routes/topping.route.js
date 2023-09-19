@@ -1,12 +1,9 @@
 import express from 'express';
-import { productController } from '../controllers/product.controller.js';
-import multer from 'multer'
+import { authController } from '../controllers/user.controller.js';
 import auth from '../middleware/auth.middleware.js';
 const router = express.Router();
 import rateLimit from 'express-rate-limit';
-
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+import { toppingController } from '../controllers/topping.controller.js';
 
 const createAccountLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour window
@@ -25,13 +22,11 @@ const createAccountLimiter = rateLimit({
  *       200:
  *         description: Successful response
  */
-router.post('/addProduct', createAccountLimiter, upload.single('image'), productController.addProduct);
-router.get('/allProduct', productController.getAllProduct);
-router.get('/productDetail/:id', productController.getDetailProduct);
-router.put('/productDetail/:id', productController.updateProduct);
+router.post('/topping', toppingController.addTopping);
+router.get('/allTopping', toppingController.getAllTopping);
 
 
-// router.post('/login', productController.logIn);
+// router.post('/login', authController.logIn);
 
 
 export default router;

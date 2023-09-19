@@ -24,12 +24,12 @@ const productSchema = new mongoose.Schema({
   },
   imageName: {
     type: String,
-    // url: {
-    //   type: String,
-    //   default: 'abc.png',
-    //   required: true
-    // }
   },
+  topping: [{
+    default: [],
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Topping'
+  }]
 });
 
 // Create the Product model
