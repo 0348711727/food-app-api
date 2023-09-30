@@ -29,21 +29,21 @@ const s3 = new S3Client({
 
 export const authController = {
   signUp: catchAsyncError(async (req, res, next) => {
-    const { name, email, password, title } = req.body;
+    const { name, telephone, password } = req.body;
     const { file } = req;
     let passwordHashed = null;
     let user = {};
     try {
-      // if (!email || !password || !name) return next(new ErrorHandler(`Please fill in all the required fields`, 200));
+      user = await User.findOne({ telephone });
+      console.log({ user, telephone });
+      if (user) return next(new ErrorHandler(`Telephone: ${user.telephone} is already exist`, 200));
 
-      // user = await User.findOne({ email })
-      // if (user) return next(new ErrorHandler(`Email: ${user.email} is already exist`, 200));
-
+      if (!password) return next(new ErrorHandler('Password is missing', 200));
       // const check = await checkGmailExist(email)
 
       // if (!check) return next(new ErrorHandler(`Your Google Gmail account does not exist`, 200));
 
-      // passwordHashed = await hashPassword(password);
+      passwordHashed = await hashPassword(password);
 
       // await sendToken(email, res)
 
@@ -54,7 +54,7 @@ export const authController = {
       // user = await verifyJWT(token, next)// reasign user from token
 
       // const sendMailRes = await sendMail(email, next, user.tokenForSignup, `to activate your account`)
-      // user = await addUser(req.body, passwordHashed)
+      user = await addUser(req.body, passwordHashed)
 
       // await saveToAWS({ file: req.file })
       // const url = await signedUrl({ file: req.file })
@@ -65,23 +65,21 @@ export const authController = {
       // const command = new GetObjectCommand(params);
 
       // const url = await getSignedUrl(s3, command, { expiresIn: 60 })
-      return res.send({
-        url
-      });
-      // return res.status(200).json({ sendMailRes })
+      // return res.send({
+      //   url
+      // });
+      return res.status(200).json({ user });
     } catch (error) {
-      return next(new ErrorHandler(error, 400))
+      return next(new ErrorHandler(error, 400));
     }
   }),
   logIn: catchAsyncError(async (req, res, next) => {
-    const { email, password } = req.body;
+    const { telephone, password } = req.body;
 
     try {
-      if (!email || !password) return next(new ErrorHandler(`Please enter email and password`, 404))
+      const user = await User.findOne({ telephone }).select("+password")
 
-      const user = await User.findOne({ email }).select("+password")
-
-      if (!user) return next(new ErrorHandler(`Invalid email or password`, 404))
+      if (!user) return next(new ErrorHandler(`Invalid telephone or password`, 404))
 
       const passwordHashed = user.password;
 
@@ -189,9 +187,9 @@ export async function hashPassword(password) {
 }
 
 export async function addUser(props, passwordHash) {
-  const { name, email } = props;
+  const { name, telephone } = props;
   const newUser = new User({
-    email,
+    telephone,
     name,
     password: passwordHash,
     avatar: '',
@@ -262,13 +260,13 @@ async function updateResetPasswordToken(email, tokenReset) {
 //compare password for login action
 export async function passwordCompare(props, passwordHashed, next) {
 
-  await User.find({ email: props.email }).select("+password")
+  await User.find({ telephone: props.telephone }).select("+password")
 
   return new Promise((resolve, reject) => {
 
-    bcrypt.compare(props.password, passwordHashed, async (err, result) => {
+    bcrypt.compare(props.password, passwordHashed, async (_, result) => {
 
-      if (err) { reject(next(new ErrorHandler(`Password is incorrect`, 404))) }
+      if (!result) { reject(next(new ErrorHandler(`Password is incorrect`, 200))) }
 
       resolve(result)
     })

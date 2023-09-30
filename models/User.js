@@ -8,10 +8,16 @@ const User = mongoose.Schema({
     maxLength: [30, 'Please enter at most 30 characters'],
     minLength: [4, 'Name must be at least 4 characters']
   },
+  telephone: {
+    type: String,
+    required: [true, 'Please enter your telephone'],
+    // maxLength: [30, 'Please enter at most 30 characters'],
+    // minLength: [4, 'Name must be at least 4 characters']
+  },
   email: {
     type: String,
-    required: [true, 'Please enter your email address'],
-    unique: true,
+    // required: [true, 'Please enter your email address'],
+    // unique: true,
     validate: [validator.isEmail, 'Please enter a valid email address']
   },
   password: {
@@ -33,7 +39,7 @@ const User = mongoose.Schema({
     url: {
       type: String,
       default: 'abc.png',
-      required: true
+      // required: true
     }
   },
   roles: {
