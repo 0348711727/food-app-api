@@ -4,9 +4,12 @@ import multer from 'multer'
 import auth from '../middleware/auth.middleware.js';
 const router = express.Router();
 import rateLimit from 'express-rate-limit';
+import twilio from 'twilio';
+import dotenv from "dotenv";
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
+const authToken = process.env.TWILIO_AUTH_TOKEN;
 
 const createAccountLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour window
@@ -14,7 +17,7 @@ const createAccountLimiter = rateLimit({
   message: "Too many accounts created from this IP, please try again after an hour"
 });
 
-
+dotenv.config();
 /**
  * @openapi
  * /signup:
@@ -29,6 +32,7 @@ router.post('/signup', createAccountLimiter, upload.single('image'), authControl
 
 
 router.post('/login', authController.logIn);
-
+router.post('/sendSms', authController.sendSMSLogin);
+router.post('/verifySms', authController.verifySms);
 
 export default router;

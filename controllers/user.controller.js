@@ -6,18 +6,28 @@ import emailExistence from 'email-existence';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
-import sharp from "sharp";
 import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import dotenv from 'dotenv';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import twilio from 'twilio';
+
+
 
 dotenv.config();
 
 
-const bucketName = process.env.BUCKET_NAME
-const bucketRegion = process.env.BUCKET_REGION
-const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY
-const accessKey = process.env.AWS_ACCESS_KEY
+const bucketName = process.env.BUCKET_NAME;
+const bucketRegion = process.env.BUCKET_REGION;
+const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
+const accessKey = process.env.AWS_ACCESS_KEY;
+
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+
+// const newClient = client(accountSid, authToken);
+const verifySid = "VA2e0066fcca5a7673e3acd3f9b47ac6c6";
+
+const client = twilio(accountSid, authToken);
 
 const s3 = new S3Client({
   credentials: {
@@ -171,6 +181,41 @@ export const authController = {
   }),
   getUserDetails: catchAsyncError(async (req, res, next) => {
     // console.log(req.user)
+  }),
+  sendSMSLogin: catchAsyncError(async (req, res, next) => {
+    let { telephone } = req.body;
+    if (!telephone) return next(new ErrorHandler(`Your telephone is empty`, 404));
+    const phoneRegex = /^[0-9\-\+]{9,15}$/;
+    if (!phoneRegex.test(telephone)) {
+      return next(new ErrorHandler('Invalid phone number'));
+    }
+    if ((telephone).startsWith(0)) {
+      telephone = `+84${telephone.slice(1)}`;
+    }
+    client.verify.v2
+      .services(verifySid)
+      .verifications.create({ to: telephone, channel: 'sms' })
+      .then((verification) => res.status(200).send(verification))
+      .catch(err => next(new ErrorHandler(err)))
+  }),
+  verifySms: catchAsyncError(async (req, res, next) => {
+    let { telephone, code } = req.body;
+    if (!telephone) return next(new ErrorHandler(`Your telephone is empty`, 404));
+
+    client.verify.v2
+      .services(verifySid)
+      .verificationChecks
+      .create({
+        to: telephone,
+        code
+      })
+      .then(verification_check => {
+        if (verification_check === 'approved') {
+          return res.status(200).json({ sucess: true })
+        }
+        return res.json({ sucess: false });
+      })
+      .catch(err => next(new ErrorHandler(err)))
   })
 }
 export async function hashPassword(password) {
@@ -225,13 +270,13 @@ export async function sendMail(email, next, token, subject) {
   })
 }
 
-export async function verifyJWT(token, next) {
-  const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+// export async function verifyJWT(token, next) {
+//   const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
-  if (!decoded) return next(new ErrorHandler(`Something wrong`))
+//   if (!decoded) return next(new ErrorHandler(`Something wrong`))
 
-  return await findUser(decoded.email, next)
-}
+//   return await findUser(decoded.email, next)
+// }
 
 //create new code verify for forgot password
 async function updateResetPasswordToken(email, tokenReset) {
@@ -348,4 +393,11 @@ export async function signedUrl(props) {
   const command = new GetObjectCommand(params);
 
   return await getSignedUrl(s3, command)
+}
+export async function sendSMS(params) {
+  newClient.messages.create({
+    to: '+84921195133',
+    from: '+19523146917',
+    body: 'Nhon nhặc khầy chùa'
+  })
 }
