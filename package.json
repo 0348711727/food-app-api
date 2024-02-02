@@ -10,6 +10,7 @@
   "scripts": {
     "start": "nodemon index.js",
     "dev": "nodemon index.js",
+    "build": "webpack --config config/webpack.config.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Quang Tran",
@@ -39,5 +40,9 @@
     "twilio": "^4.19.0",
     "validator": "^13.9.0",
     "yaml": "^2.3.1"
+  },
+  "devDependencies": {
+    "webpack": "^5.90.0",
+    "webpack-cli": "^5.1.4"
   }
 }

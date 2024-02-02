@@ -42,6 +42,10 @@ app.use('/api/auth', userRouter);
 app.use('/api/product', productRouter);
 app.use('/api/topping', toppingRouter);
 
+app.get("/", (_, res) => {
+  res.send("Welcome to my API Food App");
+});
+
 app.all('*', (req, res, next) => {
   next(new ErrorHandler(`Can not find ${req.originalUrl} on this server.`, 404));
 });
@@ -49,11 +53,10 @@ app.all('*', (req, res, next) => {
 
 //swagger
 const swaggerSpec = swaggerSetup(app);
-app.get('docs.json', (req, res) => {
+app.get('docs.json', (_, res) => {
   res.setHeader('Content-Type', 'application/json');
   res.send(swaggerSpec);
 })
-
 
 
 //middleware
